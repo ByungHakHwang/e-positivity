@@ -1294,7 +1294,6 @@ def flippable_criterion(P, word):
         for a in cols[i+1]:
             combined.append((a, 1))
         combined.sort(reverse=True)
-
         p = 0
         while p < len(combined):
             q = p + 1
@@ -1312,7 +1311,16 @@ def flippable_criterion(P, word):
                     idx = 1 - idx
                 if idx == 0: col1.append(a)
                 elif idx == 1: col2.append(a)
-            if shape_of_word(P, word[:k]+col1+col2+word[k+conj[i]+conj[i+1]:]) == conjugate(conj[:i]+[conj[i]+1,conj[i+1]-1]+conj[i+2:]):
+            remainder_cols = [col1, col2] + [list(col) for col in cols[i+2:]]
+            for col_index in range(1, len(remainder_cols)-1):
+                for a in remainder_cols[col_index+1]:
+                    if all(is_P_compatible(P, a, b) for b in remainder_cols[col_index]):
+                        remainder_cols[col_index].append(a)
+                        remainder_cols[col_index+1].remove(a)
+                remainder_cols[col_index].sort(reverse=True)
+            changed_word = []
+            for col in remainder_cols: changed_word.extend(col)
+            if shape_of_word(P, word[:k]+changed_word) == conjugate(conj[:i]+[conj[i]+1,conj[i+1]-1]+conj[i+2:]):
                 return False
             p = q
         
@@ -1493,6 +1501,10 @@ DB_DATA = {
         },
     "flippble":
         {"PATH": '/Users/hwangbyunghak/Documents/Sage/e-positivity/DB/counter_examples_flippable.json',
+         "good_checker": combine_backward_connected_and_flippable,
+        },
+    "flippble_v2":
+        {"PATH": '/Users/hwangbyunghak/Documents/Sage/e-positivity/DB/counter_examples_flippable_v2.json',
          "good_checker": combine_backward_connected_and_flippable,
         },
 }
