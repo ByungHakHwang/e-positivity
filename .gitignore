@@ -1,0 +1,9 @@
+Data/*
+font/*
+test/*
+*.json
+*.ipynb
+*.png
+*.ipynb*
+*.zip
+*.txt
